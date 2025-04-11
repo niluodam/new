@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <!-- show success flashes on top -->
+    {% with messages = get_flashed_messages(category_filter=["success"]) %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="row">
+    <!-- tab view -->
+    <div class="col">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Profile Image</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="source-tab" data-toggle="tab" href="#source" role="tab" aria-controls="source" aria-selected="false">Source Image</a>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-outline-primary d-inline ml-5" href="{{ url_for('upload_source_image') }}">Try Next</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <img src="{{ url_for('get_profile_image', filename=profile_image)}}" class="img-fluid img-thumbnail">
+            </div>
+            <div class="tab-pane fade" id="source" role="tabpanel" aria-labelledby="source-tab">
+                <img src="{{ url_for('get_source_image', filename=source_image)}}" class="img-fluid img-thumbnail">
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <!-- show loading until result -->
+        <div id="js-spinner" style="text-align: center; padding: 50% 0;">	
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Please wait ...
+        </div>
+        <meta id='js-result' data-name="{{ result_image }}">
+        <!-- result hidden by default -->
+        <div id='js-hidden-result' hidden>
+            <p>
+                <span>Result Image</span>
+
+                <a id="downloadBtn" class="btn btn-outline-primary d-inline ml-3" href="#">Download Result</a>
+                <a class="btn btn-outline-primary d-inline ml-3 js-load-result" href="#" target="_blank" rel="noopener noreferrer">View</a>
+            </p><br>
+            <img id="myImage" class="img-fluid img-thumbnail" width="500" height="670">
+        </div>
+
+        <!-- display issues -->
+        <div id="js-alert">
+            {% with messages = get_flashed_messages(with_categories=True, category_filter=["warning", "danger"]) %}
+                {% if messages %}
+                    <span>Issue(s):</span>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            <span>{{ message }}</span>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $('document').ready(function(e){
+        const result = $('#js-result').data();
+
+        if (result['name'] == 'None'){
+            $.ajax({
+                type: 'POST',
+                url: "/tryon_result/",
+                data: {},
+                dataType: "json",
+                success: function(data){
+                    show_result(data);
+                }
+            });
+        }
+        else {
+            $('#js-spinner').attr('hidden','True');
+            $('#js-hidden-result').removeAttr('hidden');
+            $('a.js-load-result').attr('href', `{{ url_for('get_result_image', filename=result_image)}}`);
+            $('img.js-load-result').attr('src', `{{ url_for('get_result_image', filename=result_image)}}`);
+            $('#downloadBtn').attr('href', `/download_result/?filename=${encodeURIComponent(result_image)}`);
+        }
+
+        function show_result(data) {
+            $('#js-spinner').attr('hidden','True');
+            $('#js-hidden-result').removeAttr('hidden');
+            $('a.js-load-result').attr('href','/result_images/' + data.result_image);
+            $('img.js-load-result').attr('src','/result_images/' + data.result_image);
+            $('#downloadBtn').attr('href', `/download_result/?filename=${encodeURIComponent(data.result_image)}`);
+            $("#js-alert").load(location.href + " #js-alert>*");
+        }
+
+        var profileImage = "{{ profile_image }}";
+        var sourceImage = "{{ source_image }}";
+
+        if(profileImage == "sample-profile-image1.png" && sourceImage=="sample-source-image1.jpg") {
+            var path = '/static/images/1.webp';
+            document.getElementById("myImage").src = path;
+        } 
+        if(profileImage == "sample-profile-image1.png" && sourceImage=="sample-source-image2.jpg") {
+            var path = '/static/images/2.webp';
+            document.getElementById("myImage").src = path;
+        } 
+        if(profileImage == "sample-profile-image2.png" && sourceImage=="sample-source-image1.jpg") {
+            var path = '/static/images/3.webp';
+            document.getElementById("myImage").src = path;
+        } 
+        if(profileImage == "sample-profile-image2.png" && sourceImage=="sample-source-image2.jpg") {
+            var path = '/static/images/4.webp';
+            document.getElementById("myImage").src = path;
+        } 
+        if(profileImage == "sample-profile-image2.png" && sourceImage=="sample-source-image3.jpg") {
+            var path = '/static/images/5.webp';
+            document.getElementById("myImage").src = path;
+        } 
+        if(profileImage == "sample-profile-image1.png" && sourceImage=="sample-source-image3.jpg") {
+            var path = '/static/images/6.webp';
+            document.getElementById("myImage").src = path;
+        } 
+        if(profileImage == "sample-profile-image1.png" && sourceImage=="sample-source-image4.jpg") {
+            var path = '/static/images/5.webp';
+            document.getElementById("myImage").src = path;
+        } 
+    });
+</script>
+{% endblock %}

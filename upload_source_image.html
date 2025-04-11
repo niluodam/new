@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    .sample-image {
+        height: 120px;
+        margin: 10px;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+    .sample-image:hover {
+        transform: scale(2);
+        z-index: 999;
+        position: relative;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-6 col-md">
+        {% if source_image %}
+            <img src="{{ url_for('get_source_image', filename=source_image)}}" class="img-fluid img-box">
+        {% else %}
+            <img src="{{ url_for('static', filename='images/samples/source_images/sample-source-image3.jpg')}}" class="img-fluid img-box">
+        {% endif %}
+    </div>
+
+    <div class="col-6 col-md">
+        <h2 class="display-5">Pick a Cloth to Try On</h2>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <span>{{ message }}</span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Sample Images -->
+        <div class="js-sample-images d-flex flex-wrap">
+            <!-- loaded dynamically -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        let sampleImageSection = $('div.js-sample-images');
+
+        // Load sample source images from backend
+        $.ajax({
+            type: "GET",
+            url: "/sample_source_images/",
+            dataType: "json",
+            success: function(data){
+                const images = data.sample_source_images;
+                sampleImageSection.append("<label class='mt-2 mb-2'>Choose from below:</label><br>");
+                for (let img of images) {
+                    let imgTag = $("<img>", {
+                        class: "sample-image",
+                        src: "/source_images/" + img,
+                        alt: "sample cloth",
+                        click: function () {
+                            window.location.href = "/pick_source_image/" + img;
+                        }
+                    });
+                    sampleImageSection.append(imgTag);
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

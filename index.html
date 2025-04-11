@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  body {
+    background-color: #f8f9fa;
+  }
+
+  .hero-section {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 3rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  }
+
+  .hero-image {
+    max-height: 320px;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .step-icon {
+    font-size: 2rem;
+    color: #0d6efd;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    color: #0d6efd;
+    font-weight: 600;
+  }
+
+  .btn-primary {
+    background-color: #0d6efd;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #0b5ed7;
+  }
+</style>
+
+<div class="container py-5">
+
+  <!-- Hero Section -->
+  <div class="row align-items-center hero-section mb-5">
+    <div class="col-lg-6 mb-4 mb-lg-0 text-center text-lg-start">
+      <h1 class="display-5 fw-bold text-primary">Virtual Clothing Try-On</h1>
+      <p class="lead text-secondary">Try on outfits from online stores or celebrity styles. Just upload your photo and see how it looks!</p>
+      <a href="{{ url_for('upload_profile_image') }}" class="btn btn-primary btn-lg mt-3">Start Try-On</a>
+    </div>
+    <div class="col-lg-6 text-center">
+      {% if profile_image %}
+        <img src="{{ url_for('get_profile_image', filename=profile_image)}}" class="img-fluid hero-image" alt="Profile Image">
+      {% else %}
+        <img src="{{ url_for('static', filename='images/samples/profile_images/sample-profile-image1.jpg')}}" class="img-fluid hero-image" alt="Sample Image">
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="text-center mb-5">
+    <h2 class="section-title mb-4">How It Works</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="step-icon">1</div>
+        <h5 class="fw-bold">Upload Photo</h5>
+        <p>Choose a clear upper-body image of yourself.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-icon">2</div>
+        <h5 class="fw-bold">Select Outfit</h5>
+        <p>Pick a clothing image from our samples or upload your own.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-icon">3</div>
+        <h5 class="fw-bold">View Result</h5>
+        <p>AI blends the outfit onto your photo to show how it fits.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example Result -->
+  <div class="text-center mb-5">
+    <h2 class="section-title mb-4">Example Result</h2>
+    <img src="{{ url_for('static', filename='static/images/samples/results/sample-result-image1.jpg')}}" class="img-fluid hero-image" alt="Try-On Example">
+  </div>
+
+  <!-- Call to Action -->
+  <div class="text-center">
+    <a href="{{ url_for('upload_profile_image') }}" class="btn btn-primary btn-lg px-5">Try It Now</a>
+  </div>
+
+</div>
+{% endblock %}
